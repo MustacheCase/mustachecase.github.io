@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zanadir: does your CI actually block?</title>
+<meta name="description" content="zanadir reads a repository's CI configuration and reports which security and quality controls are missing, or wired so they cannot fail a build.">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+<style>
+  :root {
+    --bg: #fbfaf7; --surface: #ffffff; --text: #1c1b19; --muted: #5d5a53;
+    --line: #e4e0d8; --accent: #b4441f; --code-bg: #f2efe8;
+    --enforcing: #2f6f3e; --partial: #8a6a12; --advisory: #b4441f; --unknown: #5d5a53;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413; --surface: #1d1c1a; --text: #ece9e2; --muted: #a39f96;
+      --line: #33312d; --accent: #e7845c; --code-bg: #24221f;
+      --enforcing: #7cc28c; --partial: #d9b453; --advisory: #e7845c; --unknown: #a39f96;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 72px; }
+  h1 { font-size: 2.6rem; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 1.15rem; margin: 48px 0 12px; }
+  p.lede { font-size: 1.2rem; color: var(--muted); margin: 0 0 28px; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 12px;
+  }
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .verdict { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .verdict b { display: block; font-size: 0.95rem; }
+  .verdict small { color: var(--muted); font-size: 0.85rem; }
+  .enforcing b { color: var(--enforcing); } .partial b { color: var(--partial); }
+  .advisory b { color: var(--advisory); } .unknown b { color: var(--unknown); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; }
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Does your CI <span>actually block</span>?</h1>
+  <p class="lede">zanadir reads a repository's CI configuration and reports which security and quality controls are missing, or wired so they cannot fail a build.</p>
+
+  <pre><code>zanadir scan --dir .
+zanadir scan --repo github.com/owner/name
+zanadir fix --dir .</code></pre>
+
+  <div class="links">
+    <a href="https://github.com/MustacheCase/zanadir">GitHub</a>
+    <a href="https://github.com/MustacheCase/zanadir#installation">Install</a>
+    <a href="https://github.com/MustacheCase/zanadir-action">GitHub Action</a>
+    <a href="/llms.txt">llms.txt</a>
+  </div>
+
+  <h2>Present is not protected</h2>
+  <p>A scanner with <code>continue-on-error</code>, <code>--exit-code 0</code>, <code>|| true</code> or a push-only trigger is in the pipeline but cannot stop a merge. zanadir grades every control it finds:</p>
+  <div class="verdicts">
+    <div class="verdict enforcing"><b>enforcing</b><small>can fail a merge</small></div>
+    <div class="verdict partial"><b>partial</b><small>runs, but not on every change</small></div>
+    <div class="verdict advisory"><b>advisory</b><small>cannot fail a build</small></div>
+    <div class="verdict unknown"><b>unknown</b><small>behind a condition the file cannot settle</small></div>
+  </div>
+
+  <h2>What it checks</h2>
+  <ul>
+    <li>Twelve categories: SCA, secrets detection, SAST, linting, unit tests, coverage, licences, end-of-life, IaC, supply chain, workflow security and performance testing.</li>
+    <li>Six CI platforms: GitHub Actions, GitLab CI, CircleCI, Bitbucket Pipelines, Azure Pipelines and Jenkins.</li>
+    <li>Into what the jobs call: Makefiles, Taskfiles, tox, goreleaser, reusable workflows, composite actions and CI templates.</li>
+    <li>With <code>--required-checks</code>, whether branch protection requires the check at all.</li>
+  </ul>
+
+  <h2>With OpenSSF Scorecard</h2>
+  <p>Scorecard rates a project's security practices across the repository. zanadir reads the CI configuration and tells you whether the controls you have would stop a bad change, and what to add. Use both.</p>
+
+  <footer>zanadir is open source, by <a href="https://github.com/MustacheCase">MustacheCase</a>.</footer>
+</main>
+</body>
+</html>
