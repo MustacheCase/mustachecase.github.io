@@ -61,6 +61,7 @@ zanadir fix --dir .</code></pre>
     <a href="https://github.com/MustacheCase/zanadir#installation">Install</a>
     <a href="https://github.com/MustacheCase/zanadir-action">GitHub Action</a>
     <a href="/llms.txt">llms.txt</a>
+    <a href="/state-of-ci/">State of CI security 2026</a>
   </div>
 
   <h2>Present is not protected</h2>
@@ -79,6 +80,9 @@ zanadir fix --dir .</code></pre>
     <li>Into what the jobs call: Makefiles, Taskfiles, tox, goreleaser, reusable workflows, composite actions and CI templates.</li>
     <li>With <code>--required-checks</code>, whether branch protection requires the check at all.</li>
   </ul>
+
+  <h2>State of CI security 2026</h2>
+  <p>We scanned 1,000 of the most-starred GitHub repositories with CI. 511 declare no dependency, secret or code scanning anywhere in the repository, and 1 in 6 of those that do run a scanner in CI have one that cannot fail the build. <a href="/state-of-ci/">Read the report</a>.</p>
 
   <h2>With OpenSSF Scorecard</h2>
   <p>Scorecard rates a project's security practices across the repository. zanadir reads the CI configuration and tells you whether the controls you have would stop a bad change, and what to add. Use both.</p>
