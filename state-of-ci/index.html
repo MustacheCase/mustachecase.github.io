@@ -63,16 +63,19 @@
   <p class="lede">We read the CI configuration of 1,000 of the most-starred GitHub repositories and asked two questions: which security and quality checks run, and can they fail a build?</p>
 
   <div class="stats">
-    <div class="stat"><b>511</b><small>declare no dependency, secret or code scanning anywhere in the repository, not even a Dependabot file</small></div>
-    <div class="stat"><b>69%</b><small>of the repositories with dependency scanning rely only on Dependabot or Renovate (294 of 425)</small></div>
-    <div class="stat"><b>1 in 6</b><small>repositories that run a security scanner in CI have one that cannot fail the build (47 of 290)</small></div>
+    <div class="stat"><b>509</b><small>declare no dependency, secret or code scanning anywhere in the repository, not even a Dependabot file</small></div>
+    <div class="stat"><b>68%</b><small>of the repositories with dependency scanning rely only on Dependabot or Renovate (292 of 429)</small></div>
+    <div class="stat"><b>1 in 6</b><small>repositories that run a security scanner in CI have one that cannot fail the build (50 of 295)</small></div>
   </div>
 
   <h2>Tests yes, security no</h2>
-  <p>763 of the 1,000 run unit tests in CI, and 496 of those 763 run no dependency, secret or code scanner in their pipelines. Secrets detection is the rarest security check: 29 repositories run one in CI. Only 16 run all three of dependency scanning, secrets detection and SAST.</p>
+  <p>767 of the 1,000 run unit tests in CI, and 495 of those 767 run no dependency, secret or code scanner in their pipelines. Secrets detection is the rarest security check: 29 repositories run one in CI. Only 16 run all three of dependency scanning, secrets detection and SAST.</p>
+
+  <h2>Agent skills, unscanned</h2>
+  <p>339 of the 1,000 ship agent skills: <code>SKILL.md</code> files that tell Claude Code, Codex and other agents what to do. None of the 339 scans them in CI for prompt injection or malicious code.</p>
 
   <h2>Present is not protected</h2>
-  <p>A scanner that cannot fail the build reports findings that nobody is made to act on. Of the 290 repositories that run a dependency, secret or code scanner in CI, 47 have at least one that cannot block a merge: it is behind <code>continue-on-error</code>, runs only on a schedule or a push to the default branch, or is told never to exit with an error. Across all categories, 121 repositories have at least one such check.</p>
+  <p>A scanner that cannot fail the build reports findings that nobody is made to act on. Of the 295 repositories that run a dependency, secret or code scanner in CI, 50 have at least one that cannot block a merge: it is behind <code>continue-on-error</code>, runs only on a schedule or a push to the default branch, is told never to exit with an error, or is a scanner that only reports unless told to fail, such as Trivy without <code>--exit-code</code> or <code>semgrep scan</code> without <code>--error</code>. Across all categories, 127 repositories have at least one such check.</p>
   <p>Dependency bots are counted apart. Dependabot and Renovate open pull requests rather than fail builds, by design. They are worth having, but a repository whose only dependency check is a bot has nothing that stops a known-vulnerable dependency from being merged.</p>
 
   <h2>Every category</h2>
@@ -80,33 +83,35 @@
   <table>
     <thead><tr><th>Category</th><th>Run in CI, of repositories where it applies</th><th>Of those, cannot fail the build</th></tr></thead>
     <tbody>
-      <tr><td>Unit tests</td><td class="n">763 of 1000 (76%)</td><td class="n">23</td></tr>
-      <tr><td>Linter</td><td class="n">484 of 1000 (48%)</td><td class="n">22</td></tr>
-      <tr><td>SCA (dependency scanning)</td><td class="n">425 of 1000 (42%)</td><td class="n">16</td></tr>
-      <tr><td>SAST</td><td class="n">217 of 1000 (22%)</td><td class="n">29</td></tr>
-      <tr><td>Coverage</td><td class="n">196 of 1000 (20%)</td><td class="n">13</td></tr>
-      <tr><td>Workflow security</td><td class="n">137 of 996 (14%)</td><td class="n">19</td></tr>
-      <tr><td>Supply chain (SBOM, signing)</td><td class="n">81 of 1000 (8%)</td><td class="n">4</td></tr>
-      <tr><td>Licence compliance</td><td class="n">33 of 1000 (3%)</td><td class="n">4</td></tr>
-      <tr><td>Secrets detection</td><td class="n">29 of 1000 (3%)</td><td class="n">7</td></tr>
+      <tr><td>Unit tests</td><td class="n">767 of 1000 (77%)</td><td class="n">24</td></tr>
+      <tr><td>Linter</td><td class="n">494 of 1000 (49%)</td><td class="n">24</td></tr>
+      <tr><td>SCA (dependency scanning)</td><td class="n">429 of 1000 (43%)</td><td class="n">18</td></tr>
+      <tr><td>SAST</td><td class="n">219 of 1000 (22%)</td><td class="n">31</td></tr>
+      <tr><td>Coverage</td><td class="n">202 of 1000 (20%)</td><td class="n">15</td></tr>
+      <tr><td>Workflow security</td><td class="n">142 of 996 (14%)</td><td class="n">19</td></tr>
+      <tr><td>Supply chain (SBOM, signing)</td><td class="n">83 of 1000 (8%)</td><td class="n">2</td></tr>
+      <tr><td>Licence compliance</td><td class="n">34 of 1000 (3%)</td><td class="n">5</td></tr>
+      <tr><td>Secrets detection</td><td class="n">29 of 1000 (3%)</td><td class="n">8</td></tr>
       <tr><td>Performance testing</td><td class="n">2 of 1000 (0%)</td><td class="n">0</td></tr>
       <tr><td>IaC security</td><td class="n">1 of 501 (0%)</td><td class="n">1</td></tr>
+      <tr><td>Agent skill security</td><td class="n">0 of 339 (0%)</td><td class="n">–</td></tr>
       <tr><td>End-of-life checks</td><td class="n">0 of 1000 (0%)</td><td class="n">–</td></tr>
     </tbody>
   </table>
   </div>
-  <p class="note">IaC security applies only where the repository holds infrastructure code (501 repositories), and workflow security only to GitHub Actions (996). "Cannot fail the build" counts checks in a pipeline graded advisory or partial; dependency bots are excluded from it.</p>
+  <p class="note">IaC security applies only where the repository holds infrastructure code (501 repositories), workflow security only to GitHub Actions (996), and agent skill security only where the repository holds a <code>SKILL.md</code> (339). "Cannot fail the build" counts checks in a pipeline graded advisory or partial; dependency bots are excluded from it.</p>
 
   <h2>What this does not see</h2>
   <ul>
     <li><b>Settings.</b> GitHub's secret scanning and push protection, CodeQL default setup and Dependabot alerts are switched on in repository settings and leave no file. Many popular repositories use them, so secrets detection, SAST and dependency scanning here are a floor for what these projects run, not a census. This report measures what their CI configuration enforces.</li>
-    <li><b>Whether a check is required.</b> A check that can fail still blocks nothing unless branch protection requires it. This report does not read branch protection; <code>zanadir scan --required-checks</code> does, for one repository.</li>
+    <li><b>Whether a check is required.</b> A check that can fail still blocks nothing unless branch protection requires it. This report does not read branch protection; <code>zanadir scan --required-checks</code> does, for one repository. We ran it on the 50 repositories with a security scanner that cannot fail: none had a merge rule, such as code scanning protection, that blocks on that scanner's findings.</li>
     <li><b>Builds that hide their tools.</b> A linter run inside <code>./gradlew build</code>, or by a script CI calls but zanadir does not follow, is not counted.</li>
   </ul>
 
   <h2>Method</h2>
-  <p>The candidates were the 2,000 most-starred public GitHub repositories that are not archived and not forks, taken from GitHub search on 2026-10-17, and scanned on 2026-10-21. Each was scanned in star order with <a href="https://github.com/MustacheCase/zanadir/releases/tag/0.17.0">zanadir 0.17.0</a> (<code>zanadir scan --repo github.com/owner/name --output json</code>) until 1,000 had CI configuration. 225 had none, mostly lists, books and documentation, and 4 were too large to download. 996 of the 1,000 use GitHub Actions, 32 CircleCI, 12 Azure Pipelines, 4 GitLab CI and 4 Jenkins; some use more than one.</p>
-  <p>zanadir follows what jobs call: Makefiles, Taskfiles, tox, <code>package.json</code> scripts, turbo, nx, reusable workflows and composite actions. Before publishing, we checked a random sample of verdicts by hand against each repository's workflow files. Doing so found five gaps in what zanadir follows, which were fixed in 0.16.0 and 0.17.0 before this scan.</p>
+  <p>The candidates were the 2,000 most-starred public GitHub repositories that are not archived and not forks, taken from GitHub search on 2026-10-17, and scanned on 2026-10-29. Each was scanned in star order with <a href="https://github.com/MustacheCase/zanadir/releases/tag/0.24.2">zanadir 0.24.2</a> (<code>zanadir scan --repo github.com/owner/name --output json</code>) until 1,000 had CI configuration. 224 had none, mostly lists, books and documentation, and 4 were too large to download. 996 of the 1,000 use GitHub Actions, 31 CircleCI, 12 Azure Pipelines, 4 GitLab CI and 3 Jenkins; some use more than one.</p>
+  <p>zanadir follows what jobs call: Makefiles, Taskfiles, tox, <code>package.json</code> scripts, turbo, nx, reusable workflows and composite actions. Before publishing, we checked a random sample of verdicts by hand against each repository's workflow files. Doing so found five gaps in what zanadir follows, which were fixed in 0.16.0 and 0.17.0 before the first scan.</p>
+  <p>The first edition, on 2026-10-21, used zanadir 0.17.0. Since then zanadir has learned that Trivy, Grype, Kubescape, Semgrep and TruffleHog exit 0 on findings unless told otherwise, and this edition is a rescan with that grading. We checked every security verdict that changed by hand. One is a false positive, a script that only names <code>npm audit</code> in a label, and it is left in the counts.</p>
   <p>This page reports aggregates only and names no project. The tool that produced it is <a href="https://github.com/MustacheCase/zanadir/tree/main/tools/stateofci">open source</a>, so you can run it yourself.</p>
 
   <h2>Check your own</h2>
