@@ -43,6 +43,10 @@
   .advisory b { color: var(--advisory); } .unknown b { color: var(--unknown); }
   ul { padding-left: 20px; }
   li { margin: 4px 0; }
+  .cta {
+    display: inline-block; font-weight: 600; color: #fff; background: var(--accent);
+    border-radius: 8px; padding: 10px 20px; text-decoration: none; margin: 0 0 20px;
+  }
   .links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; }
   footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
 </style>
@@ -51,6 +55,8 @@
 <main>
   <h1>Does your CI <span>actually block</span>?</h1>
   <p class="lede">zanadir reads a repository's CI configuration and reports which security and quality controls are missing, or wired so they cannot fail a build.</p>
+
+  <a class="cta" href="/scan/">Scan a repository in your browser</a>
 
   <pre><code>zanadir scan --dir .
 zanadir scan --repo github.com/owner/name
@@ -75,7 +81,7 @@ zanadir fix --dir .</code></pre>
 
   <h2>What it checks</h2>
   <ul>
-    <li>Twelve categories: SCA, secrets detection, SAST, linting, unit tests, coverage, licences, end-of-life, IaC, supply chain, workflow security and performance testing.</li>
+    <li>Thirteen categories: SCA, secrets detection, SAST, linting, unit tests, coverage, licences, end-of-life, IaC, supply chain, workflow security, performance testing and agent skill security.</li>
     <li>Six CI platforms: GitHub Actions, GitLab CI, CircleCI, Bitbucket Pipelines, Azure Pipelines and Jenkins.</li>
     <li>Into what the jobs call: Makefiles, Taskfiles, tox, goreleaser, reusable workflows, composite actions and CI templates.</li>
     <li>With <code>--required-checks</code>, whether branch protection requires the check at all.</li>
