@@ -16,7 +16,7 @@ env:
   # both with each release. The commit is what is built, so a moved tag
   # cannot change the site; it fails the deploy instead.
   ZANADIR_VERSION: 0.26.0
-  ZANADIR_COMMIT: "0000000000000000000000000000000000000000"
+  ZANADIR_COMMIT: "1085336783176458b1ff8914dedbb853b5178d6a"
 
 jobs:
   build:
