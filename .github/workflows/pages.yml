@@ -1,0 +1,84 @@
+name: Deploy the site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # The zanadir release /scan/ runs and the commit its tag points at. Bump
+  # both with each release. The commit is what is built, so a moved tag
+  # cannot change the site; it fails the deploy instead.
+  ZANADIR_VERSION: 0.26.0
+  ZANADIR_COMMIT: "1085336783176458b1ff8914dedbb853b5178d6a"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: site
+          persist-credentials: false
+
+      - name: Check the release tag points at the pinned commit
+        run: |
+          remote=https://github.com/MustacheCase/zanadir
+          tagged=$(git ls-remote "$remote" "refs/tags/$ZANADIR_VERSION^{}" | cut -f1)
+          [ -n "$tagged" ] || tagged=$(git ls-remote "$remote" "refs/tags/$ZANADIR_VERSION" | cut -f1)
+          if [ "$tagged" != "$ZANADIR_COMMIT" ]; then
+            echo "::error::zanadir $ZANADIR_VERSION points at ${tagged:-nothing}, not the pinned $ZANADIR_COMMIT"
+            exit 1
+          fi
+
+      - name: Check out zanadir
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: MustacheCase/zanadir
+          ref: ${{ env.ZANADIR_COMMIT }}
+          path: zanadir
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: zanadir/go.mod
+          cache: false
+
+      - name: Build the scan page
+        run: make -C zanadir web WEB_VERSION="$ZANADIR_VERSION"
+
+      - name: Assemble the site
+        run: |
+          mkdir _site
+          cp -R site/. _site/
+          rm -rf _site/.git _site/.github
+          cp -R zanadir/dist/scan _site/scan
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
