@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zanadir vs OpenSSF Scorecard</title>
+<meta name="description" content="zanadir and OpenSSF Scorecard compared: Scorecard rates a project's security practices; zanadir grades whether a CI/CD pipeline's security checks can fail the build.">
+<link rel="canonical" href="https://mustachecase.github.io/compare/openssf-scorecard/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zanadir vs OpenSSF Scorecard">
+<meta property="og:description" content="zanadir and OpenSSF Scorecard compared: Scorecard rates a project's security practices; zanadir grades whether a CI/CD pipeline's security checks can fail the build.">
+<meta property="og:url" content="https://mustachecase.github.io/compare/openssf-scorecard/">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+<style>
+  :root {
+    --bg: #fbfaf7; --surface: #ffffff; --text: #1c1b19; --muted: #5d5a53;
+    --line: #e4e0d8; --accent: #b4441f; --code-bg: #f2efe8;
+    --enforcing: #2f6f3e; --partial: #8a6a12; --advisory: #b4441f; --unknown: #5d5a53;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413; --surface: #1d1c1a; --text: #ece9e2; --muted: #a39f96;
+      --line: #33312d; --accent: #e7845c; --code-bg: #24221f;
+      --enforcing: #7cc28c; --partial: #d9b453; --advisory: #e7845c; --unknown: #a39f96;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 72px; }
+  h1 { font-size: 2.6rem; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 1.15rem; margin: 48px 0 12px; }
+  p.lede { font-size: 1.2rem; color: var(--muted); margin: 0 0 28px; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 12px;
+  }
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .verdict { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .verdict b { display: block; font-size: 0.95rem; }
+  .verdict small { color: var(--muted); font-size: 0.85rem; }
+  .enforcing b { color: var(--enforcing); } .partial b { color: var(--partial); }
+  .advisory b { color: var(--advisory); } .unknown b { color: var(--unknown); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .cta {
+    display: inline-block; font-weight: 600; color: #fff; background: var(--accent);
+    border-radius: 8px; padding: 10px 20px; text-decoration: none; margin: 0 0 20px;
+  }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; }
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 0.95rem; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  .yes { color: var(--enforcing); font-weight: 600; } .no { color: var(--muted); font-weight: 600; }
+  nav { margin: 0 0 24px; font-size: 0.95rem; }
+  @media (max-width: 560px) { table { font-size: 0.88rem; } th, td { padding: 6px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav><a href="/">zanadir</a> · <a href="/scan/">Scan a repository</a> · <a href="/state-of-ci/">State of CI 2026</a></nav>
+  <h1>zanadir and <span>OpenSSF Scorecard</span></h1>
+  <p class="lede">Both are open-source tools for repository and CI/CD security, and they answer different questions. Scorecard rates a project's security practices. zanadir reads the CI pipeline and grades whether the security checks it runs can actually fail the build. Most projects benefit from both.</p>
+
+  <table>
+    <tr><th></th><th>OpenSSF Scorecard</th><th>zanadir</th></tr>
+    <tr><td>Question</td><td>Does this project follow good security practices?</td><td>Does this pipeline block a bad change, and what is it missing?</td></tr>
+    <tr><td>Reads</td><td>The forge's API and the repository: branch protection, reviews, releases, workflows</td><td>The CI configuration, followed into Makefiles, scripts, package.json scripts, reusable workflows and templates</td></tr>
+    <tr><td>Security tools</td><td>Checks for SAST through known apps such as CodeQL or SonarCloud, and for Dependabot or Renovate</td><td>More than 130 tools across 13 categories: dependency, secret and code scanning, IaC, SBOM and signing, workflow security, linting, tests and more</td></tr>
+    <tr><td>Can the check fail?</td><td>Records that a tool is present</td><td>Grades each one <b>enforcing</b>, <b>partial</b>, <b>advisory</b> or <b>unknown</b>: a scanner with <code>continue-on-error</code>, <code>|| true</code> or no fail flag is present but cannot stop a merge</td></tr>
+    <tr><td>CI platforms</td><td>GitHub first; several checks, SAST and CI-Tests among them, are GitHub-only</td><td>GitHub Actions, GitLab CI, CircleCI, Bitbucket Pipelines, Azure Pipelines and Jenkins</td></tr>
+    <tr><td>Beyond CI</td><td>Code review, maintenance, licence, security policy, fuzzing, signed releases, binary artifacts</td><td>Not covered: zanadir stays inside the pipeline</td></tr>
+    <tr><td>Fixing gaps</td><td>Remediation text per check</td><td><code>zanadir fix</code> prints ready-to-paste CI configuration, or writes a workflow</td></tr>
+    <tr><td>Output</td><td>A 0–10 score per check, JSON, SARIF, a badge</td><td>Table, JSON, SARIF, Markdown, a coverage badge</td></tr>
+  </table>
+
+  <h2>When to use which</h2>
+  <ul>
+    <li>Use <b>Scorecard</b> to judge a project, or a dependency you are about to adopt, on its overall security hygiene.</li>
+    <li>Use <b>zanadir</b> to find out whether your own pipeline would stop a vulnerable dependency, a leaked secret or an injectable workflow, and to get the configuration that closes the gap.</li>
+    <li>Use <b>both</b>: zanadir counts a Scorecard workflow as one of the workflow security controls it looks for.</li>
+  </ul>
+
+  <h2>Try zanadir</h2>
+  <a class="cta" href="/scan/">Scan a repository in your browser</a>
+  <p>Or see how it maps to the <a href="/owasp-cicd-top-10/">OWASP Top 10 CI/CD Security Risks</a>.</p>
+
+  <footer>zanadir is open source, by <a href="https://github.com/MustacheCase">MustacheCase</a>. <a href="https://github.com/MustacheCase/zanadir">GitHub</a>.</footer>
+</main>
+</body>
+</html>
