@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zanadir and the OWASP Top 10 CI/CD Security Risks</title>
+<meta name="description" content="How an open-source CI/CD security tool maps to the OWASP Top 10 CI/CD Security Risks: which risks zanadir checks in a pipeline, and which it cannot see.">
+<link rel="canonical" href="https://mustachecase.github.io/owasp-cicd-top-10/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zanadir and the OWASP Top 10 CI/CD Security Risks">
+<meta property="og:description" content="How an open-source CI/CD security tool maps to the OWASP Top 10 CI/CD Security Risks: which risks zanadir checks in a pipeline, and which it cannot see.">
+<meta property="og:url" content="https://mustachecase.github.io/owasp-cicd-top-10/">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+<style>
+  :root {
+    --bg: #fbfaf7; --surface: #ffffff; --text: #1c1b19; --muted: #5d5a53;
+    --line: #e4e0d8; --accent: #b4441f; --code-bg: #f2efe8;
+    --enforcing: #2f6f3e; --partial: #8a6a12; --advisory: #b4441f; --unknown: #5d5a53;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413; --surface: #1d1c1a; --text: #ece9e2; --muted: #a39f96;
+      --line: #33312d; --accent: #e7845c; --code-bg: #24221f;
+      --enforcing: #7cc28c; --partial: #d9b453; --advisory: #e7845c; --unknown: #a39f96;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 72px; }
+  h1 { font-size: 2.6rem; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 1.15rem; margin: 48px 0 12px; }
+  p.lede { font-size: 1.2rem; color: var(--muted); margin: 0 0 28px; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 12px;
+  }
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .verdict { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .verdict b { display: block; font-size: 0.95rem; }
+  .verdict small { color: var(--muted); font-size: 0.85rem; }
+  .enforcing b { color: var(--enforcing); } .partial b { color: var(--partial); }
+  .advisory b { color: var(--advisory); } .unknown b { color: var(--unknown); }
+  ul { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .cta {
+    display: inline-block; font-weight: 600; color: #fff; background: var(--accent);
+    border-radius: 8px; padding: 10px 20px; text-decoration: none; margin: 0 0 20px;
+  }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; }
+  footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 0.95rem; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  .yes { color: var(--enforcing); font-weight: 600; } .no { color: var(--muted); font-weight: 600; }
+  nav { margin: 0 0 24px; font-size: 0.95rem; }
+  @media (max-width: 560px) { table { font-size: 0.88rem; } th, td { padding: 6px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav><a href="/">zanadir</a> · <a href="/scan/">Scan a repository</a> · <a href="/state-of-ci/">State of CI 2026</a></nav>
+  <h1>zanadir and the <span>OWASP Top 10 CI/CD Security Risks</span></h1>
+  <p class="lede">The <a href="https://owasp.org/www-project-top-10-ci-cd-security-risks/">OWASP Top 10 CI/CD Security Risks</a> lists what attackers abuse in build pipelines. zanadir is an open-source CI/CD security tool that reads a repository's pipeline and checks that the controls for these risks are there, and that they can actually fail the build.</p>
+
+  <p>zanadir does not find the attacks itself. For each risk below, it checks that a tool which does runs in CI, and grades whether that tool can stop a merge: <b>enforcing</b>, <b>partial</b>, <b>advisory</b> or <b>unknown</b>. Four of the ten are platform and organisation settings that a repository's files cannot show, and zanadir says so rather than guessing.</p>
+
+  <table>
+    <tr><th>Risk</th><th>What zanadir checks</th></tr>
+    <tr><td><b>CICD-SEC-1</b> Insufficient Flow Control Mechanisms</td><td><span class="yes">Covered.</span> Every security check is graded on whether it runs on pull requests or only after the push. With <code>--required-checks</code>, a check counts only when branch protection or a ruleset requires it to merge.</td></tr>
+    <tr><td><b>CICD-SEC-2</b> Inadequate Identity and Access Management</td><td><span class="no">Not covered.</span> Identities and access live in the organisation's settings, not in the repository.</td></tr>
+    <tr><td><b>CICD-SEC-3</b> Dependency Chain Abuse</td><td><span class="yes">Covered (SCA).</span> A dependency scanner such as Grype, Trivy, OSV-Scanner, govulncheck, pip-audit or npm audit runs and can fail, not only a Dependabot or Renovate configuration.</td></tr>
+    <tr><td><b>CICD-SEC-4</b> Poisoned Pipeline Execution</td><td><span class="yes">Covered (Workflow Security).</span> A workflow scanner such as zizmor, poutine, actionlint or glsec, which finds script injection and untrusted checkouts, runs and can fail.</td></tr>
+    <tr><td><b>CICD-SEC-5</b> Insufficient Pipeline-Based Access Controls</td><td><span class="yes">Covered (Workflow Security).</span> The same scanners flag workflow tokens with more permissions than a job needs.</td></tr>
+    <tr><td><b>CICD-SEC-6</b> Insufficient Credential Hygiene</td><td><span class="yes">Covered (Secrets Detection).</span> A secret scanner such as Gitleaks, TruffleHog or ggshield runs and can fail.</td></tr>
+    <tr><td><b>CICD-SEC-7</b> Insecure System Configuration</td><td><span class="no">Not covered.</span> Runner and CI server configuration is outside the repository.</td></tr>
+    <tr><td><b>CICD-SEC-8</b> Ungoverned Usage of 3rd Party Services</td><td><span class="no">Not covered.</span> Installed apps and integrations live in the organisation's settings. Workflow scanners do flag unpinned third-party actions, one slice of this risk.</td></tr>
+    <tr><td><b>CICD-SEC-9</b> Improper Artifact Integrity Validation</td><td><span class="yes">Covered (Supply Chain).</span> An SBOM (Syft, CycloneDX), a signature (Cosign) or provenance (SLSA, GitHub attestations, in-toto) is produced, graded on the workflow that ships the release.</td></tr>
+    <tr><td><b>CICD-SEC-10</b> Insufficient Logging and Visibility</td><td><span class="no">Not covered.</span> Audit logs are a platform setting.</td></tr>
+  </table>
+
+  <h2>Try it</h2>
+  <p>Scan a public GitHub repository in your browser, with nothing to install, or run it on your own checkout:</p>
+  <a class="cta" href="/scan/">Scan a repository in your browser</a>
+  <pre><code>zanadir scan --dir . --required-checks
+zanadir fix --dir .</code></pre>
+  <p><code>zanadir fix</code> prints the CI configuration that closes the gaps it found.</p>
+
+  <footer>zanadir is open source, by <a href="https://github.com/MustacheCase">MustacheCase</a>. <a href="https://github.com/MustacheCase/zanadir">GitHub</a>.</footer>
+</main>
+</body>
+</html>

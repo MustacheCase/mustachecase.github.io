@@ -3,8 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>zanadir: does your CI actually block?</title>
-<meta name="description" content="zanadir reads a repository's CI configuration and reports which security and quality controls are missing, or wired so they cannot fail a build.">
+<title>zanadir: open-source CI/CD security check for your pipeline</title>
+<meta name="description" content="zanadir is an open-source CI/CD security tool. It reads a repository's pipeline, from GitHub Actions to GitLab CI, and reports which security checks are missing and which can never fail the build.">
+<link rel="canonical" href="https://mustachecase.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="zanadir: does your CI actually block?">
+<meta property="og:description" content="Open-source CI/CD security check: finds the security checks your pipeline is missing, and the ones that can never fail the build.">
+<meta property="og:url" content="https://mustachecase.github.io/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"zanadir","applicationCategory":"DeveloperApplication","applicationSubCategory":"CI/CD security","operatingSystem":"Linux, macOS, Windows","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","url":"https://mustachecase.github.io/","codeRepository":"https://github.com/MustacheCase/zanadir","description":"Open-source CI/CD security tool that reports which security checks a repository's pipeline is missing, and which can never fail the build."}</script>
 <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
 <style>
   :root {
@@ -54,7 +61,7 @@
 <body>
 <main>
   <h1>Does your CI <span>actually block</span>?</h1>
-  <p class="lede">zanadir reads a repository's CI configuration and reports which security and quality controls are missing, or wired so they cannot fail a build.</p>
+  <p class="lede">zanadir is an open-source CI/CD security tool. It reads a repository's pipeline, from GitHub Actions to GitLab CI, and reports which security and quality checks are missing, and which are wired so they can never fail the build.</p>
 
   <a class="cta" href="/scan/">Scan a repository in your browser</a>
 
@@ -68,6 +75,8 @@ zanadir fix --dir .</code></pre>
     <a href="https://github.com/MustacheCase/zanadir-action">GitHub Action</a>
     <a href="/llms.txt">llms.txt</a>
     <a href="/state-of-ci/">State of CI security 2026</a>
+    <a href="/owasp-cicd-top-10/">OWASP CI/CD Top 10</a>
+    <a href="/compare/openssf-scorecard/">vs OpenSSF Scorecard</a>
   </div>
 
   <h2>Present is not protected</h2>
@@ -86,12 +95,13 @@ zanadir fix --dir .</code></pre>
     <li>Into what the jobs call: Makefiles, Taskfiles, tox, goreleaser, reusable workflows, composite actions and CI templates.</li>
     <li>With <code>--required-checks</code>, whether branch protection requires the check at all.</li>
   </ul>
+  <p>Mapped to the OWASP Top 10 CI/CD Security Risks, it covers six of the ten from the repository alone. <a href="/owasp-cicd-top-10/">See the mapping</a>.</p>
 
   <h2>State of CI security 2026</h2>
   <p>We scanned 1,000 of the most-starred GitHub repositories with CI. 511 declare no dependency, secret or code scanning anywhere in the repository, and 1 in 6 of those that do run a scanner in CI have one that cannot fail the build. <a href="/state-of-ci/">Read the report</a>.</p>
 
   <h2>With OpenSSF Scorecard</h2>
-  <p>Scorecard rates a project's security practices across the repository. zanadir reads the CI configuration and tells you whether the controls you have would stop a bad change, and what to add. Use both.</p>
+  <p>Scorecard rates a project's security practices across the repository. zanadir reads the CI configuration and tells you whether the controls you have would stop a bad change, and what to add. Use both. <a href="/compare/openssf-scorecard/">How they compare</a>.</p>
 
   <footer>zanadir is open source, by <a href="https://github.com/MustacheCase">MustacheCase</a>.</footer>
 </main>
