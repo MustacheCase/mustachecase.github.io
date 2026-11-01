@@ -15,8 +15,8 @@ env:
   # The zanadir release /scan/ runs and the commit its tag points at. Bump
   # both with each release. The commit is what is built, so a moved tag
   # cannot change the site; it fails the deploy instead.
-  ZANADIR_VERSION: 0.26.1
-  ZANADIR_COMMIT: "03c0ce14abf0dd70c8c364e73353618329edf000"
+  ZANADIR_VERSION: 0.27.0
+  ZANADIR_COMMIT: "a60dd7ef9857a9385f085b1a7b5faaa0ee8fc7cb"
 
 jobs:
   build:
