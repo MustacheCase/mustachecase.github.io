@@ -5,11 +5,11 @@
 - Categories: SCA, Secrets Detection, SAST, Linter, Unit Tests, Coverage, License Compliance, End Of Life, IaC Security, Supply Chain (SBOM, signing, provenance), Workflow Security, Agent Skill Security (scanners for SKILL.md files), Performance Testing.
 - Each control found is graded: `enforcing` (can fail a merge), `partial` (runs, but not on every change, e.g. push-only), `advisory` (cannot fail: continue-on-error, `|| true`, allow_failure, soft-fail flags, or a scanner that exits 0 on findings by default, such as `trivy` without `--exit-code 1` or `grype` without `--fail-on`) or `unknown` (behind a condition the file cannot settle).
 - CI platforms: GitHub Actions, GitLab CI, CircleCI, Bitbucket Pipelines, Azure Pipelines, Jenkins. It follows Makefiles, Taskfiles, tox, goreleaser, go-make, package.json scripts (npm, yarn, pnpm, bun, npm-run-all, turbo, lerna, nx), reusable workflows, local composite actions and CI templates into the commands they run.
-- Input: a checkout (`--dir`) or a GitHub repository without cloning (`--repo github.com/owner/name`). Output: table, JSON, SARIF, Markdown.
+- Input: a checkout (`--dir`) or a GitHub repository without cloning (`--repo github.com/owner/name`). Output: table, JSON, SARIF, Markdown. Every report also lists each covered category with the tools found for it (nancy, Dependabot, go test, ...) and each tool's grade.
 - `--required-checks` counts a control as enforcing only when branch protection or a ruleset requires its check. `--enforce`, `--fail-on` and `--fail-on-weakened` fail a CI run on gaps.
 - It complements OpenSSF Scorecard, which rates project-wide practices through the forge's API; zanadir reads the CI configuration and grades whether each control can fail a build.
 
-For AI coding agents, `zanadir mcp` is a Model Context Protocol server with two read-only tools: `scan` (the JSON report) and `fix` (configuration for the gaps), each taking `dir` (inside the server's `--dir`) or `repo` (anonymous unless the server runs with `--repo-token`). It is listed in the MCP Registry as `io.github.MustacheCase/zanadir`. Add it with `claude mcp add zanadir -- zanadir mcp`, or `{"command": "zanadir", "args": ["mcp"]}` in other clients.
+For AI coding agents, `zanadir mcp` is a Model Context Protocol server with three read-only tools: `scan` (the JSON report), `fix` (configuration for the gaps) and `skills` (problems in the agent skills), each taking `dir` (inside the server's `--dir`) or `repo` (anonymous unless the server runs with `--repo-token`). It is listed in the MCP Registry as `io.github.MustacheCase/zanadir`. Add it with `claude mcp add zanadir -- zanadir mcp`, or `{"command": "zanadir", "args": ["mcp"]}` in other clients.
 
 ## Usage
 
@@ -21,6 +21,8 @@ zanadir scan --dir . --required-checks --fail-on-weakened
 zanadir fix --dir .
 zanadir fix --dir . --write   # writes .github/workflows/zanadir-suggested.yml
 zanadir skills --dir .        # checks the agent skills (SKILL.md) in a checkout
+zanadir skills --repo github.com/owner/name   # the same, without cloning
+zanadir skills --home         # your own skills: ~/.claude, ~/.agents, ~/.codex, ~/.cursor
 ```
 
 Try without installing: in the browser at https://mustachecase.github.io/scan/?repo=owner/name (public repositories; zanadir runs there as WebAssembly), or `docker run --rm mustachecase/zanadir scan --repo github.com/owner/name`. Install: a prebuilt archive for Linux, macOS or Windows from https://github.com/MustacheCase/zanadir/releases/latest, `go install github.com/MustacheCase/zanadir@latest`, Homebrew (`brew tap --custom-remote MustacheCase/zanadir https://github.com/MustacheCase/zanadir.git && brew install mustachecase/zanadir/zanadir`), or the Docker image `mustachecase/zanadir`. In GitHub Actions, use `MustacheCase/zanadir-action`.
